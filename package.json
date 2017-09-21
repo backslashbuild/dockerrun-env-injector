@@ -1,0 +1,12 @@
+{
+  "name": "dockerrun-env-injector",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "commander": "^2.11.0",
+    "dotenv": "^4.0.0"
+  },
+  "bin": {
+    "dinject": "./index.js"
+  }
+}

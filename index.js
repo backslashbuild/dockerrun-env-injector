@@ -2,6 +2,7 @@
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
+const colors = require('colors');
 const program = require('commander');
 const dotenv = require('dotenv');
 
@@ -9,7 +10,12 @@ const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
 const handleError = error => {
-  console.error(error);
+  console.log(colors.red(error));
+  process.exit(1);
+}
+
+const showHelp = () => {
+  program.outputHelp(colors.red);
   process.exit(1);
 }
 
@@ -22,16 +28,10 @@ program
   .option('-e, --env <env>', 'The dotenv file, defaults to ./.env')
   .action(async containerName => {
 
-    if(!containerName) {
-      return handleError('Must provide container name');
-    }
-
     try {
       const template = program.template && path.resolve(program.template) || path.resolve('Dockerrun.aws.template.json');
       const output = program.output && path.resolve(program.output) || path.resolve('Dockerrun.aws.json');
       const env = program.env && path.resolve(program.env) || path.resolve('.env');
-
-      console.log(`using template ${template}, output ${output}, env ${env}`)
 
       const config = dotenv.parse(await readFile(env, { encoding: 'utf8' }).catch(handleError));
       const dockerrun = require(template);
@@ -43,5 +43,9 @@ program
       return handleError(e);
     }
   });
+
+if(!process.argv.slice(2).length) {
+  showHelp()
+}
 
 program.parse(process.argv);
